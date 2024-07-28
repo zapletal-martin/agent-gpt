@@ -1,11 +1,12 @@
 from autogen import ConversableAgent, UserProxyAgent, config_list_from_json
+import copy
 
 # Load LLM inference endpoints from an env variable or a file
 # See https://microsoft.github.io/autogen/docs/FAQ#set-your-api-endpoints
 # and OAI_CONFIG_LIST_sample
 
 def context(response):
-    return "".join([x for xs in chat_result.chat_history for x in xs["content"]])
+    return response.chat_history[-1]["content"]
 
 config_list = config_list_from_json(env_or_file="/myapp/config_list")
 
@@ -19,43 +20,51 @@ perp_message = "You are a member of a criminal gang. You are being interrogated 
 detective = ConversableAgent(
     "Police Detective",
     system_message=detective_message,
-    llm_config={"config_list": config_list}
+    llm_config={
+        "config_list": config_list,
+        "cache_seed": None
+    }
 )
 
 perp1 = ConversableAgent(
     "Criminal Gang Member 1",
     system_message=perp_message,
-    llm_config={"config_list": config_list}
+    llm_config={
+        "config_list": config_list,
+        "cache_seed": None
+    }
 )
 perp2 = ConversableAgent(
     "Criminal Gang Member 2",
     system_message=perp_message,
-    llm_config={"config_list": config_list}
+    llm_config={
+        "config_list": config_list,
+        "cache_seed": None
+    }
 )
 
-chat_result=detective.initiate_chat(
+chat_result=copy.deepcopy(
+        detective.initiate_chat(
+            perp1,
+            message="Are you going to testify about the other criminal gang member's crimes or stay silent?. I need your answer, either testify or silence.",
+            max_turns=1
+        )
+    )
+chat_result_2=copy.deepcopy(
+        detective.initiate_chat(
+            perp2,
+            message="Are you going to testify about the other criminal gang member's crimes or stay silent?. I need your answer, either testify or silence.",
+            max_turns=1
+        )
+    )
+
+detective.initiate_chat(
     perp1,
-    message="Are you going to testify about the other criminal gang member's crimes or stay silent?. I need your answer, either testify or silence.",
-    clear_history=False,
-    max_turns=1
-)
-chat_result_2=detective.initiate_chat(
-    perp2,
-    clear_history=False,
-    message="Are you going to testify about the other criminal gang member's crimes or stay silent?. I need your answer, either testify or silence.",
+    message="Ok, I am back to communicate your partner's decision and your sentence." + " You said: \"" + context(chat_result) + "\". Your criminal gang member partner said: \"" + context(chat_result_2) + "\"",
     max_turns=1
 )
 detective.initiate_chat(
-    perp1,
-    clear_history=False,
-    message="Ok, I am back to communicate your partner's decision and your sentence.",
-    max_turns=2
-#    carryover="Criminal Gang Member 1 said: " + context(chat_result) + ". Criminal Gang Member 2 said: " + context(chat_result_2)
-)
-detective.initiate_chat(
     perp2,
-    clear_history=False,
-    message="Ok, I am back to communicate your partner's decision and your sentence.",
-    max_turns=2
-#    carryover="Criminal Gang Member 1 said: " + context(chat_result) + ". Criminal Gang Member 2 said: " + context(chat_result_2)
+    message="Ok, I am back to communicate your partner's decision and your sentence." + " You said: \"" + context(chat_result_2) + "\". Your criminal gang member partner said: \"" + context(chat_result) + "\"",
+    max_turns=1
 )
