@@ -3,6 +3,10 @@ from autogen import ConversableAgent, UserProxyAgent, config_list_from_json
 # Load LLM inference endpoints from an env variable or a file
 # See https://microsoft.github.io/autogen/docs/FAQ#set-your-api-endpoints
 # and OAI_CONFIG_LIST_sample
+
+def context(response):
+    return "".join([x for xs in chat_result.chat_history for x in xs["content"]])
+
 config_list = config_list_from_json(env_or_file="/myapp/config_list")
 
 user_proxy = UserProxyAgent(
@@ -35,7 +39,7 @@ chat_result=detective.initiate_chat(
     clear_history=False,
     max_turns=1
 )
-chat_result=detective.initiate_chat(
+chat_result_2=detective.initiate_chat(
     perp2,
     clear_history=False,
     message="Are you going to testify about the other criminal gang member's crimes or stay silent?. I need your answer, either testify or silence.",
@@ -46,10 +50,12 @@ detective.initiate_chat(
     clear_history=False,
     message="Ok, I am back to communicate your partner's decision and your sentence.",
     max_turns=2
+#    carryover="Criminal Gang Member 1 said: " + context(chat_result) + ". Criminal Gang Member 2 said: " + context(chat_result_2)
 )
 detective.initiate_chat(
     perp2,
     clear_history=False,
     message="Ok, I am back to communicate your partner's decision and your sentence.",
     max_turns=2
+#    carryover="Criminal Gang Member 1 said: " + context(chat_result) + ". Criminal Gang Member 2 said: " + context(chat_result_2)
 )
