@@ -29,25 +29,27 @@ perp2 = ConversableAgent(
     llm_config={"config_list": config_list}
 )
 
-detective.initiate_chat(
+chat_result=detective.initiate_chat(
     perp1,
     message="Are you going to testify about the other criminal gang member's crimes or stay silent?. I need your answer, either testify or silence.",
-    max_turns=2
+    clear_history=False,
+    max_turns=1
 )
-detective.initiate_chat(
+chat_result=detective.initiate_chat(
     perp2,
+    clear_history=False,
     message="Are you going to testify about the other criminal gang member's crimes or stay silent?. I need your answer, either testify or silence.",
-    max_turns=2
+    max_turns=1
 )
-
 detective.initiate_chat(
     perp1,
+    clear_history=False,
     message="Ok, I am back to communicate your partner's decision and your sentence.",
     max_turns=2
 )
 detective.initiate_chat(
     perp2,
+    clear_history=False,
     message="Ok, I am back to communicate your partner's decision and your sentence.",
     max_turns=2
 )
-
