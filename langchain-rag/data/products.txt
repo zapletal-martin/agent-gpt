@@ -1,0 +1,3 @@
+product "A": blue t-shirt, cost $20
+product "B": red dress, cost $30
+product "C": brown shoes, cost $35

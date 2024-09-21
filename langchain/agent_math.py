@@ -9,7 +9,7 @@ dotenv.load_dotenv()
 llm = ChatOpenAI(model="gpt-4o-mini", temperature=1)
 
 teacher_prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are math teacher. You job is to ask simple math questions. Be creative. Only respond with the single question."),
+    ("system", "You are math teacher. You job is to ask math questions. Be as creative as possible. Only respond with the single question."),
     ("user", "{input}")
 ])
 
